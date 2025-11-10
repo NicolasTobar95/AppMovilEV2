@@ -1,6 +1,6 @@
 APP MOVIL EV2 – Aplicación Android de Interconexión de Activities
 
--- DESCRIPCIÓN GENERAL -- adasd 
+-- DESCRIPCIÓN GENERAL -- adasd 2
 
 La aplicación AppMovilEV2 fue desarrollada para mostrar cómo se comunican varias pantallas (Activities) en Android.
 
