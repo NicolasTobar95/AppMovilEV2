@@ -3,70 +3,90 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@color/backgroundColor">
+    android:background="@drawable/bg_patron_repetido"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center_horizontal">
+        android:gravity="center"
+        android:padding="24dp">
 
-        <!-- Campo de Nombre -->
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_person"
+            app:tint="@color/colorPrimary"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear Cuenta"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorTextPrimary"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Únete y comienza a cocinar"
+            android:textColor="#757575"
+            android:layout_marginBottom="32dp"/>
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre completo">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editNombre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Campo de Correo -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Correo electrónico"
-            android:layout_marginTop="12dp">
+            android:hint="Correo Electrónico"
+            android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editCorreo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Campo de Contraseña -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Contraseña"
-            android:layout_marginTop="12dp">
+            android:layout_marginBottom="12dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editContrasenaReg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botón para Registrar -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnRegistrarCuenta"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registrar cuenta"
-            android:layout_marginTop="24dp"
-            app:cornerRadius="8dp" />
+            android:hint="Confirmar Contraseña"
+            android:layout_marginBottom="24dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editConfirmarContrasena"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botón para Volver al login -->
-        <com.google.android.material.button.MaterialButton
+        <Button
+            android:id="@+id/btnRegistrarCuenta"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Registrarme"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
             android:id="@+id/btnVolverLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Volver al login"
-            android:layout_marginTop="8dp"
-            app:cornerRadius="8dp" />
+            android:text="Ya tengo cuenta"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorPrimaryDark"/>
+
     </LinearLayout>
 </ScrollView>

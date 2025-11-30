@@ -38,6 +38,11 @@
         <!-- MainActivity -->
         <activity android:name=".MainActivity" />
 
+        <!-- Pantallas recetas -->
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".AgregarRecetaActivity" />
+        <activity android:name=".VerRecetaActivity" />
+
     </application>
 
 </manifest>

@@ -1,123 +1,146 @@
 package com.example.appmovilev2
 
-import android.Manifest
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 class LoginActivity : AppCompatActivity() {
 
-    // Variables para los campos de texto y botones
+    // Variables de UI
     private lateinit var campoUsuario: EditText
     private lateinit var campoContrasena: EditText
     private lateinit var botonIniciar: Button
-    private lateinit var botonRegistrar: Button
-    private lateinit var botonRecuperar: Button
-    private lateinit var botonBluetooth: Button
+    private lateinit var botonGoogle: Button
+    private lateinit var botonRegistrar: TextView
+    private lateinit var botonRecuperar: TextView
 
-    // Código de solicitud del permiso Bluetooth
-    private val CODIGO_SOLICITUD_BLUETOOTH = 100
+    // Variables de Firebase
+    private lateinit var auth: FirebaseAuth
+    private val CODIGO_GOOGLE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Asignación de vistas (referencias del XML)
+        // 1. Inicializar Firebase Auth
+        auth = FirebaseAuth.getInstance()
+
+        // 2. Verificar si ya hay alguien logueado (Auto-login)
+        if (auth.currentUser != null) {
+            irAlHome()
+        }
+
+        // 3. Vincular vistas
         campoUsuario = findViewById(R.id.editUsuario)
         campoContrasena = findViewById(R.id.editContrasena)
         botonIniciar = findViewById(R.id.btnIniciar)
+        botonGoogle = findViewById(R.id.btnGoogle)
         botonRegistrar = findViewById(R.id.btnRegistrar)
         botonRecuperar = findViewById(R.id.btnRecuperar)
-        botonBluetooth = findViewById(R.id.btnBluetooth)
 
-        // Acción: Iniciar sesión
+        // 4. Configurar botones
         botonIniciar.setOnClickListener {
-            val usuarioTexto = campoUsuario.text.toString().trim()
-            val contrasenaTexto = campoContrasena.text.toString().trim()
-
-            if (usuarioTexto.isEmpty() || contrasenaTexto.isEmpty()) {
-                mostrarDialogo("Error", "Por favor ingrese usuario y contraseña.")
-            } else {
-                mostrarDialogo("Inicio de sesión", "Inicio de sesión exitoso.")
-            }
+            loginConEmail()
         }
 
-        // Acción: Ir a Registrar cuenta
+        botonGoogle.setOnClickListener {
+            loginConGoogle()
+        }
+
         botonRegistrar.setOnClickListener {
-            val intentRegistro = Intent(this@LoginActivity, RegisterActivity::class.java)
-            startActivity(intentRegistro)
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        // Acción: Ir a Recuperar clave
         botonRecuperar.setOnClickListener {
-            val intentRecuperar = Intent(this@LoginActivity, RecoverActivity::class.java)
-            startActivity(intentRecuperar)
-        }
-
-        // Acción: Ver estado del Bluetooth
-        botonBluetooth.setOnClickListener {
-            verificarPermisoBluetooth()
+            startActivity(Intent(this, RecoverActivity::class.java))
         }
     }
 
-    // Metodo para mostrar un cuadro de diálogo (alerta simple)
+    private fun loginConEmail() {
+        val email = campoUsuario.text.toString().trim()
+        val pass = campoContrasena.text.toString().trim()
+
+        if (email.isEmpty() || pass.isEmpty()) {
+            mostrarDialogo("Error", "Por favor ingrese correo y contraseña")
+            return
+        }
+
+        auth.signInWithEmailAndPassword(email, pass)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Login exitoso -> Usamos Toast porque es una notificación rápida y no invasiva
+                    Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                    irAlHome()
+                } else {
+                    mostrarDialogo("Error de Acceso", task.exception?.message ?: "Error desconocido")
+                }
+            }
+    }
+
+    private fun loginConGoogle() {
+        // Configuración para pedir el email y el token
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id)) // Firebase genera esto automático
+            .requestEmail()
+            .build()
+
+        val googleClient = GoogleSignIn.getClient(this, gso)
+        // Lanzamos la ventana de Google
+        startActivityForResult(googleClient.signInIntent, CODIGO_GOOGLE)
+    }
+
+    // Recibimos el resultado de la ventana de Google
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == CODIGO_GOOGLE) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                // Google dijo que sí, ahora avisamos a Firebase
+                val cuenta = task.getResult(ApiException::class.java)
+                autenticarEnFirebase(cuenta.idToken!!)
+            } catch (e: ApiException) {
+                mostrarDialogo("Error Google", "Fallo: ${e.message}")
+            }
+        }
+    }
+
+    private fun autenticarEnFirebase(token: String) {
+        val credencial = GoogleAuthProvider.getCredential(token, null)
+        auth.signInWithCredential(credencial)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                    irAlHome()
+                } else {
+                    mostrarDialogo("Error", "No se pudo autenticar en Firebase")
+                }
+            }
+    }
+
+    private fun irAlHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        // Estas flags evitan que el usuario vuelva al login pulsando "Atrás"
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
     private fun mostrarDialogo(titulo: String, mensaje: String) {
         AlertDialog.Builder(this)
             .setTitle(titulo)
             .setMessage(mensaje)
             .setPositiveButton("Aceptar", null)
             .show()
-    }
-
-    // Verifica si el permiso de Bluetooth está otorgado o lo solicita
-    private fun verificarPermisoBluetooth() {
-        val permisoBluetooth = Manifest.permission.BLUETOOTH_CONNECT
-        when {
-            ContextCompat.checkSelfPermission(this, permisoBluetooth) == PackageManager.PERMISSION_GRANTED -> {
-                mostrarEstadoBluetooth()
-            }
-            else -> {
-                ActivityCompat.requestPermissions(this, arrayOf(permisoBluetooth), CODIGO_SOLICITUD_BLUETOOTH)
-            }
-        }
-    }
-
-    // Muestra el estado actual del Bluetooth (activado/desactivado)
-    private fun mostrarEstadoBluetooth() {
-        val adaptadorBluetooth = BluetoothAdapter.getDefaultAdapter()
-        if (adaptadorBluetooth == null) {
-            mostrarDialogo("Bluetooth", "Este dispositivo no soporta Bluetooth.")
-            return
-        }
-
-        val estadoBluetooth = if (adaptadorBluetooth.isEnabled)
-            "Bluetooth activado"
-        else
-            "Bluetooth desactivado"
-
-        mostrarDialogo("Estado del Bluetooth", estadoBluetooth)
-    }
-
-    // Maneja la respuesta del usuario al permiso solicitado
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permisos: Array<out String>,
-        resultados: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permisos, resultados)
-        if (requestCode == CODIGO_SOLICITUD_BLUETOOTH) {
-            if (resultados.isNotEmpty() && resultados[0] == PackageManager.PERMISSION_GRANTED) {
-                mostrarEstadoBluetooth()
-            } else {
-                mostrarDialogo("Permiso denegado", "No se puede acceder al estado del Bluetooth sin permiso.")
-            }
-        }
     }
 }
