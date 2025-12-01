@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Locale
-import coil.load
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 
 class VerRecetaActivity : AppCompatActivity() {
 
@@ -66,8 +67,26 @@ class VerRecetaActivity : AppCompatActivity() {
                         tvIngredientes.text = receta.ingredientes
                         tvPreparacion.text = receta.preparacion
 
-                        // Cargar la Imagen por URL
-                        val imageview = receta.url ?
+                        // --- LOGICA DE IMAGEN ---
+
+                        // 1. Primero, averiguamos cuál es la imagen de categoría correspondiente
+                        val imagenCategoriaId = obtenerImagenPorCategoria(receta.categoria)
+
+                        if (receta.url.isNotEmpty()) {
+                            // Si hay URL, usamos Glide
+                            Glide.with(this)
+                                .load(receta.url)
+                                .placeholder(imagenCategoriaId) // El icono de categoría mientras carga
+                                .error(imagenCategoriaId)       // El icono de categoría si falla
+                                // AGREGAMOS ESTA LÍNEA MÁGICA:
+                                .transition(DrawableTransitionOptions.withCrossFade(500)) // 500 milisegundos de suavizado
+                                .centerCrop()
+                                .into(imgDetalle)
+                        } else {
+                            // Si no hay URL, mostramos directamente la imagen de categoría
+                            imgDetalle.setImageResource(imagenCategoriaId)
+                        }
+                        // ------------------------------------
 
                         // Cargar Imagen según categoría usando la función de Receta.kt
                         //val imagenId = obtenerImagenPorCategoria(receta.categoria)

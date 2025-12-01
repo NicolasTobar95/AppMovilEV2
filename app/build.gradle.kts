@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     // Imagenes por url
-    implementation("io.coil-kt:coil:2.6.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // Tests
     testImplementation(libs.junit)

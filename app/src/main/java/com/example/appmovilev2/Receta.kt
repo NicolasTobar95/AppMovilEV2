@@ -11,7 +11,8 @@ data class Receta(
     val autorEmail: String = "",   // Quien la creo
     val autorNombre: String = "", // Nombre del autor
     val fecha: Timestamp? = null,   // Fecha de creacion
-    val categoria: String = "General" // Guarda el nombre de la imagen (ej: "Pizza")
+    val categoria: String = "General", // Guarda el nombre de la imagen (ej: "Pizza")
+    val url: String = ""
 )
 
 // Función para obtener la imagen según el texto de la categoría
