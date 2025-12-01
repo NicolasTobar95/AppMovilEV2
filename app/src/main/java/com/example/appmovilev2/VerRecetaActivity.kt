@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Locale
+import coil.load
 
 class VerRecetaActivity : AppCompatActivity() {
 
@@ -65,9 +66,12 @@ class VerRecetaActivity : AppCompatActivity() {
                         tvIngredientes.text = receta.ingredientes
                         tvPreparacion.text = receta.preparacion
 
+                        // Cargar la Imagen por URL
+                        val imageview = receta.url ?
+
                         // Cargar Imagen según categoría usando la función de Receta.kt
-                        val imagenId = obtenerImagenPorCategoria(receta.categoria)
-                        imgDetalle.setImageResource(imagenId)
+                        //val imagenId = obtenerImagenPorCategoria(receta.categoria)
+                        //imgDetalle.setImageResource(imagenId)
 
                         // Fecha
                         val fechaFormateada = if (receta.fecha != null) {

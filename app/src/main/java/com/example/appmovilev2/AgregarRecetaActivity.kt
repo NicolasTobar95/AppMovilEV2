@@ -6,7 +6,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView // Importante
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -20,6 +20,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
 
     // Vistas
     private lateinit var editTitulo: EditText
+    private lateinit var editURL: EditText
     private lateinit var editDescripcion: EditText
     private lateinit var editIngredientes: EditText
     private lateinit var editPreparacion: EditText
@@ -47,6 +48,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
 
         // Vincular vistas
         editTitulo = findViewById(R.id.editTitulo)
+        editURL = findViewById(R.id.editURL)
         editDescripcion = findViewById(R.id.editDescripcion)
         editIngredientes = findViewById(R.id.editIngredientes)
         editPreparacion = findViewById(R.id.editPreparacion)
@@ -93,6 +95,7 @@ class AgregarRecetaActivity : AppCompatActivity() {
     private fun guardarEnFirestore() {
 
         val titulo = editTitulo.text.toString().trim()
+        val url = editURL.text.toString().trim()
         val descripcion = editDescripcion.text.toString().trim()
         val ingredientes = editIngredientes.text.toString().trim()
         val preparacion = editPreparacion.text.toString().trim()
@@ -120,7 +123,8 @@ class AgregarRecetaActivity : AppCompatActivity() {
             "autorEmail" to emailAutor,
             "autorNombre" to nombreAutor,
             "fecha" to Timestamp(Date()),
-            "categoria" to categoriaSeleccionada
+            "categoria" to categoriaSeleccionada,
+            "url" to url
         )
 
         btnGuardar.isEnabled = false
